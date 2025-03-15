@@ -1,2 +1,2 @@
 Mohon maaf mas, saya terkendala dalam docker nya, karena memang sebelumnya belum pernah make docker.
-Untuk projeknya sudah berjalan normal di local dengan, namun ketika saya deploy ke docker ada masalah yang belum saya ketahui bagaimana mengatasinya hingga saat ini. Terimakasih atas kesempatan nya mas
+Untuk projeknya sudah berjalan normal di local, namun ketika saya deploy ke docker ada masalah yang belum saya ketahui bagaimana mengatasinya hingga saat ini. Terimakasih atas kesempatan nya mas
