@@ -1,22 +1,29 @@
-# Gunakan image Node.js 18
-    FROM node:18-alpine
+# Gunakan base image Node.js versi 18 untuk tahap build
+FROM node:18 as build
 
-    WORKDIR /app
+# Set working directory
+WORKDIR /app
 
-    COPY package*.json ./
+# Copy package.json dan package-lock.json (atau yarn.lock jika menggunakan Yarn)
+COPY package*.json ./
 
-    RUN npm install
+# Install dependencies
+RUN npm install
 
-    COPY . .
+# Copy seluruh file aplikasi
+COPY . .
 
-    RUN npm run build
+# Build aplikasi React menggunakan Vite
+RUN npm run build
 
-    # Gunakan Nginx untuk menyajikan file build
-    FROM nginx:alpine
+# Gunakan image Nginx untuk container akhir
+FROM nginx:alpine
 
-    # Modifikasi baris ini untuk menggunakan /app/dist
-    COPY dist /usr/share/nginx/html
+# Copy folder dist (hasil build Vite) ke direktori Nginx
+COPY --from=build /app/dist /usr/share/nginx/html
 
-    EXPOSE 80
+# Expose port 80
+EXPOSE 80
 
-    CMD ["nginx", "-g", "daemon off;"]
+# Jalankan Nginx
+CMD ["nginx", "-g", "daemon off;"]

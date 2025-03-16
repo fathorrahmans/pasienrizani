@@ -16,6 +16,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { BASE_API } from "@/utils/secretKeys";
+import { showErrorToasts } from "@/utils/helpers";
 
 interface Patient {
   id: number;
@@ -86,33 +87,35 @@ const PatientUpdateForm = ({
     e.preventDefault();
 
     try {
-      setIsLoading(true);
-      const response = await fetch(
-        `${BASE_API}/api/patient/${formData.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+  setIsLoading(true);
+  const response = await fetch(`${BASE_API}/api/patient/${formData.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
 
-      if (!response.ok) {
-        throw new Error("Failed to update patient data");
-      }
-
-      const result = await response.json();
-      onRefresh();
-      toast({
-        title: result.message,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
-      onClose(); // Close modal after update
-    } catch (error) {
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    if (errorResponse.status === "error" && errorResponse.data) {
+      showErrorToasts(toast, errorResponse.data);
+    } else {
+      throw new Error(errorResponse.message || "Failed to update patient data.");
+    }
+  } else {
+    const result = await response.json();
+    onRefresh();
+    toast({
+      title: result.message,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+      position: "top-right",
+    });
+    onClose(); 
+  }
+} catch (error) {
       toast({
         title: "Update failed",
         description: "An error occurred while updating the patient.",

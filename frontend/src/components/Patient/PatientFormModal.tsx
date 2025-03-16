@@ -18,6 +18,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { BASE_API } from "@/utils/secretKeys";
+import { showErrorToasts } from "@/utils/helpers";
 
 interface Patient {
   id: number;
@@ -46,41 +47,38 @@ const PatientFormModal: React.FC<PatientFormModalProps> = ({ onRefresh }) => {
     e.preventDefault();
 
     try {
-      setIsLoading(true);
-      const response = await fetch(`${BASE_API}/api/patient/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+  setIsLoading(true);
+  const response = await fetch(`${BASE_API}/api/patient/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
 
-      if (!response.ok) {
-        throw new Error("Failed to create patient. Please try again.");
-      }
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    if (errorResponse.status === "error" && errorResponse.data) {
+      showErrorToasts(toast, errorResponse.data);
+    } else {
+      throw new Error(errorResponse.message || "An unexpected error occurred.");
+    }
+  } else {
+    const result = await response.json();
 
-      const result = await response.json();
+    onRefresh();
+    setFormData({ id: 0, name: "", rm: "", nik: "", alamat: "" });
+    onClose();
 
-      // Refresh the patient list after successfully adding the patient
-      onRefresh();
-
-      // Reset the form data
-      setFormData({ id: 0, name: "", rm: "", nik: "", alamat: "" });
-
-      // Close the modal
-      onClose();
-
-      toast({
-        title: result.message,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
-    } catch (error) {
-      // Catching errors from the fetch or other parts of the try block
-      console.error("Error during submit:", error);
-
+    toast({
+      title: result.message,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+      position: "top-right",
+    });
+  }
+} catch (error) {
       // Optionally, you can display an error toast or message
       toast({
         title: "Error",

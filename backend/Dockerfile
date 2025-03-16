@@ -1,22 +1,40 @@
-# Gunakan image PHP 8 dengan Apache
-    FROM php:8-apache
+FROM php:8.3.11-fpm
 
-    WORKDIR /var/www/html
+# Update package list and install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libxpm-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    bash \
+    fcgiwrap \
+    libmcrypt-dev \
+    libonig-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-    RUN apt-get update && apt-get install -y \
-        git \
-        zip \
-        unzip \
-        libzip-dev \
-        default-mysql-client \
-        && docker-php-ext-install zip pdo pdo_mysql
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath opcache
 
-    COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
 
-    COPY . .
+# Copy existing application directory contents
+COPY . /var/www/html/
 
-    RUN composer install --no-dev --optimize-autoloader
+# Set ownership and permissions for the /var/www/html directory to www-data
+RUN chown -R www-data:www-data /var/www/html/
 
-    EXPOSE 80
+USER www-data
 
-    CMD ["apache2-foreground"]
+EXPOSE 9000
+
+CMD ["php-fpm"]

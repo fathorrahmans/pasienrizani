@@ -1,2 +1,5 @@
-Mohon maaf mas, saya terkendala dalam docker nya, karena memang sebelumnya belum pernah make docker.
-Untuk projeknya sudah berjalan normal di local, namun ketika saya deploy ke docker ada masalah yang belum saya ketahui bagaimana mengatasinya hingga saat ini. Terimakasih atas kesempatan nya mas
+### Mohon maaf mas, saya commit ulang, karena yang kemarin dikumpulkan sebelum jam 21.00 itu docker koneksi nya bermasalah
+
+### Note*
+1. Buat .env lalu copy dari .env.example sama persis baik di frontend maupun backend
+2. Untuk Mengakses Frontend dengan http://localhost:3000 

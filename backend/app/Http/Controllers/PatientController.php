@@ -25,7 +25,7 @@ class PatientController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to retrieve patients',
-                'data' => null
+                'data' => $e
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
